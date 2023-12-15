@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>매장 지도</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>매장 정보 입력</h2>
+
+<form id="storeForm">
+    <label for="storeName">매장명:</label>
+    <input type="text" id="storeName" required>
+
+    <label for="address">도로명 주소:</label>
+    <input type="text" id="address" required>
+
+    <label for="phoneNumber">전화번호:</label>
+    <input type="tel" id="phoneNumber" required>
+
+    <button type="button" onclick="showOnMap()">지도에 표시하기</button>
+</form>
+
+<div id="map"></div>
+
+<script
+    type="text/javascript"
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=d479cd0781a238b00ab82c569cb9ffe0"
+></script>
+<script>
+    // Kakao Maps API 초기화
+    kakao.maps.load(function () {
+        var mapContainer = document.getElementById('map');
+        var mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 대한민국 중심 좌표
+            level: 10
+        };
+
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        function showOnMap() {
+            // 폼 입력값 가져오기
+            var storeName = document.getElementById('storeName').value;
+            var address = document.getElementById('address').value;
+            var phoneNumber = document.getElementById('phoneNumber').value;
+
+            // 주소를 좌표로 변환
+            var geocoder = new kakao.maps.services.Geocoder();
+            geocoder.addressSearch(address, function (result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                    // 지도에 마커 표시
+                    var marker = new kakao.maps.Marker({
+                        position: coords,
+                        map: map,
+                        title: storeName
+                    });
+
+                    // 정보 창 표시
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content: '<div><strong>' + storeName + '</strong><br>' +
+                            '주소: ' + address + '<br>' +
+                            '전화번호: ' + phoneNumber + '</div>'
+                    });
+
+                    infowindow.open(map, marker);
+
+                    // 지도 중심 이동
+                    map.setCenter(coords);
+                } else {
+                    alert('주소를 찾을 수 없습니다.');
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
