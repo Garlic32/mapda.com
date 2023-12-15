@@ -56,6 +56,49 @@
     }
 </script>
 
+<script>
+    // 페이지가 로드될 때 저장된 매장 정보가 있는지 확인하고 있다면 지도에 표시
+    window.onload = function () {
+        var storedStores = JSON.parse(localStorage.getItem('storedStores')) || [];
+        storedStores.forEach(function (store) {
+            showStoredStoreOnMap(store);
+        });
+    };
+
+    function showStoredStoreOnMap(store) {
+        L.marker([store.latitude, store.longitude]).addTo(map)
+            .bindPopup(`<b>${store.storeName}</b><br>전화번호: ${store.phoneNumber}<br>위도: ${store.latitude}<br>경도: ${store.longitude}`)
+            .openPopup();
+    }
+
+    function showOnMap() {
+        var storeName = document.getElementById('storeName').value;
+        var phoneNumber = document.getElementById('phoneNumber').value;
+        var latitude = parseFloat(document.getElementById('latitude').value);
+        var longitude = parseFloat(document.getElementById('longitude').value);
+
+        // 맵에 마커 표시
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup(`<b>${storeName}</b><br>전화번호: ${phoneNumber}<br>위도: ${latitude}<br>경도: ${longitude}`)
+            .openPopup();
+
+        // 맵 중심 이동
+        map.panTo([latitude, longitude]);
+
+        // 저장된 매장 정보에 현재 매장 추가
+        var storedStores = JSON.parse(localStorage.getItem('storedStores')) || [];
+        storedStores.push({
+            storeName: storeName,
+            phoneNumber: phoneNumber,
+            latitude: latitude,
+            longitude: longitude
+        });
+
+        // Local Storage에 저장
+        localStorage.setItem('storedStores', JSON.stringify(storedStores));
+    }
+</script>
+    
 </body>
 </html>
 
